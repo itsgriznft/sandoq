@@ -1,0 +1,885 @@
+:root {
+  --bg: #0b0f1a;
+  --surface: #131a2b;
+  --surface-2: #1a2237;
+  --border: #263149;
+  --text: #e8ecf5;
+  --muted: #8b96ad;
+  --accent: #ff9f43;
+  --accent-ink: #2b1600;
+  --live: #3ddc97;
+  --danger: #ff6b6b;
+  --warn: #ffa94d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 70% -10%, #26203a 0%, var(--bg) 60%);
+  color: var(--text);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 16px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.page__header h1 {
+  margin: 0;
+  font-size: clamp(22px, 5vw, 28px);
+  letter-spacing: -0.02em;
+}
+
+.page__header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+
+.page__body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page__footer {
+  font-size: 13px;
+  text-align: center;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-header h2,
+.section-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.detail > .card,
+.detail > .banner,
+.detail__columns {
+  width: 100%;
+}
+
+/* `1fr` floors a track at its content's min-width, so one long address or a
+   nowrap link would push the whole page wider than the phone. `minmax(0, 1fr)`
+   lets the track shrink and the content wrap or scroll inside it instead. */
+.detail__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.detail__column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------- surfaces */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.card h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+/* ---------------------------------------------------------------- controls */
+
+.button {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+  /* Comfortable tap target on touch screens. */
+  min-height: 44px;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(1.2);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: transparent;
+}
+
+/* A disabled primary would render as muddy olive; fall back to the plain look. */
+.button--primary:disabled {
+  background: var(--surface-2);
+  color: var(--muted);
+  border-color: var(--border);
+  opacity: 1;
+}
+
+.button--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  min-height: 38px;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip--active {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+.chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.field > span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  min-width: 0;
+}
+
+.field input:focus {
+  border-color: var(--accent);
+}
+
+.field__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0 14px;
+}
+
+/* `width: 100%` from `.field input` would add to the suffix's width inside this
+   flex row and push the card wider than the viewport. Let it flex instead. */
+.field__row input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 12px 0;
+}
+
+.field__row input:focus {
+  border-color: transparent;
+}
+
+.field__row--large input {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.field__suffix {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.contribute {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------------------------------------------------------------- stats */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  position: relative;
+}
+
+.stats__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.stats__item strong {
+  font-size: 22px;
+}
+
+.stats__item span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.stats__sync {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 11px;
+  color: var(--live);
+}
+
+/* ---------------------------------------------------------------- campaign */
+
+.campaign-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.campaign-card header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.campaign-card h3 {
+  margin: 0;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.campaign-card__creator {
+  margin: -6px 0 0;
+  font-size: 12px;
+}
+
+.campaign-card__numbers {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+}
+
+.campaign-card__numbers div {
+  min-width: 0;
+}
+
+.campaign-card__numbers dt {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.campaign-card__numbers dd {
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.campaign__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.campaign__header h2 {
+  margin: 0;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.pill {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pill--live {
+  background: rgba(61, 220, 151, 0.14);
+  color: var(--live);
+}
+
+.pill--reached {
+  background: rgba(255, 159, 67, 0.16);
+  color: var(--accent);
+}
+
+.pill--closed {
+  background: rgba(139, 150, 173, 0.14);
+  color: var(--muted);
+}
+
+.progress {
+  margin: 12px 0;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff9f43, #3ddc97);
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.campaign__numbers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.campaign__numbers div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.campaign__numbers strong {
+  font-size: 18px;
+}
+
+.campaign__numbers span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.campaign__meta {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.campaign__sync {
+  margin-left: auto;
+  color: var(--live);
+}
+
+/* ---------------------------------------------------------------- wallet */
+
+.wallet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wallet--disconnected {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.wallet__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.wallet__options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  max-width: 320px;
+}
+
+.wallet__options li {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.wallet__options img {
+  border-radius: 4px;
+}
+
+/* Installed wallets read as available; the rest stay dim but visible. */
+.wallet__options .is-available {
+  border-color: var(--live);
+}
+
+.wallet__options .is-missing {
+  opacity: 0.35;
+}
+
+.wallet__account {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.wallet__address {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.wallet__balance {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- tx status */
+
+.tx__stages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tx__stages li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.4;
+}
+
+.tx__stages li.is-active,
+.tx__stages li.is-done,
+.tx__stages li.is-stopped {
+  opacity: 1;
+}
+
+.is-stopped .tx__dot {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.tx__stages strong {
+  display: block;
+  font-size: 14px;
+}
+
+.tx__stages small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tx__dot {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+
+.is-done .tx__dot {
+  background: var(--live);
+  color: #06281c;
+  border-color: transparent;
+}
+
+.is-active .tx__dot {
+  border-color: var(--accent);
+  color: var(--accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.tx--failed .tx__dot {
+  border-color: var(--danger);
+}
+
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 0 5px rgba(255, 159, 67, 0.12);
+  }
+}
+
+.tx__hash {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.tx__hash code {
+  font-size: 11px;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+/* ---------------------------------------------------------------- feed */
+
+.feed__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.feed__header h3 {
+  margin: 0;
+}
+
+.feed__header span {
+  font-size: 12px;
+}
+
+.feed {
+  min-width: 0;
+}
+
+.feed__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.feed__list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.feed__list li:last-child {
+  border-bottom: none;
+}
+
+.feed__list li.is-you .feed__who strong {
+  color: var(--accent);
+}
+
+.feed__who {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.feed__who strong {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+}
+
+.feed__who small,
+.feed__what small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.feed__what {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.feed__what strong {
+  color: var(--live);
+  font-size: 14px;
+}
+
+.feed__link {
+  font-size: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- skeleton */
+
+.skeleton {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-2) 25%, #222c45 37%, var(--surface-2) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.card[aria-busy='true'] > .skeleton + .skeleton {
+  margin-top: 8px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .is-active .tx__dot,
+  .progress__fill {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------- banner */
+
+.banner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-left: 3px solid var(--warn);
+}
+
+.banner--user_rejected {
+  border-left-color: var(--muted);
+}
+
+.banner--insufficient_balance,
+.banner--wallet_not_found {
+  border-left-color: var(--warn);
+}
+
+.banner--contract_rejected,
+.banner--unknown,
+.banner--network {
+  border-left-color: var(--danger);
+}
+
+.banner__icon {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.banner__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.banner__body strong {
+  font-size: 14px;
+}
+
+.banner__body p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.banner__kind {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.banner__close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .detail__columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Absolute positioning collides with the first stat once the grid reflows. */
+  .stats__sync {
+    position: static;
+    grid-column: 1 / -1;
+    order: 1;
+  }
+
+  .campaign__numbers {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .page__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* On a phone the wallet controls read better full width than right-aligned. */
+  .wallet,
+  .wallet--disconnected {
+    align-items: stretch;
+  }
+
+  .wallet__options {
+    justify-content: flex-start;
+    max-width: none;
+  }
+
+  .wallet__account {
+    align-items: flex-start;
+  }
+
+  .campaign__sync {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 20px 12px 40px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats__item strong {
+    font-size: 18px;
+  }
+
+  .feed__list li {
+    flex-wrap: wrap;
+  }
+
+  .feed__what {
+    margin-left: auto;
+  }
+}
