@@ -1,46 +1,25 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { averageSentiment, feedbackHistory, hasBackend, submitFeedback } from './feedback';
+import { ROLE_LABELS, SENTIMENT_LABELS, type Role, type Sentiment } from './feedback';
 
-// No jsdom; stub the browser globals the module touches. With no
-// VITE_FEEDBACK_URL set in the test env, submissions are local-only.
-beforeEach(() => {
-  const store = new Map<string, string>();
-  vi.stubGlobal('localStorage', {
-    getItem: (key: string) => store.get(key) ?? null,
-    setItem: (key: string, value: string) => store.set(key, value),
-    removeItem: (key: string) => store.delete(key),
-  });
-});
+// The on-chain read/write paths need a live RPC, so they're exercised in the
+// browser rather than here. These lock the client-side mappings that decode
+// what the contract returns — getting them wrong mislabels every entry.
 
-describe('submitFeedback', () => {
-  it('stores locally and reports no backend when none is configured', async () => {
-    expect(hasBackend).toBe(false);
-    const sent = await submitFeedback({ sentiment: 4, role: 'member', message: 'nice' });
-    expect(sent).toBe(false); // local-only, still a success for the user
-
-    const history = feedbackHistory();
-    expect(history).toHaveLength(1);
-    expect(history[0]).toMatchObject({ sentiment: 4, role: 'member', message: 'nice' });
+describe('feedback label maps', () => {
+  it('labels all five sentiment levels', () => {
+    const levels: Sentiment[] = [1, 2, 3, 4, 5];
+    for (const level of levels) {
+      expect(SENTIMENT_LABELS[level]).toBeTruthy();
+    }
+    expect(SENTIMENT_LABELS[1]).toBe('Confusing');
+    expect(SENTIMENT_LABELS[5]).toBe('Loved it');
   });
 
-  it('keeps submissions newest-first', async () => {
-    await submitFeedback({ sentiment: 2, role: 'exploring', message: 'first' });
-    await submitFeedback({ sentiment: 5, role: 'organizer', message: 'second' });
-
-    const history = feedbackHistory();
-    expect(history.map((f) => f.message)).toEqual(['second', 'first']);
-  });
-
-  it('averages the sentiment across submissions', async () => {
-    expect(averageSentiment()).toBeNull();
-    await submitFeedback({ sentiment: 2, role: 'member', message: '' });
-    await submitFeedback({ sentiment: 4, role: 'member', message: '' });
-    expect(averageSentiment()).toBe(3);
-  });
-
-  it('carries the wallet address when one is given', async () => {
-    await submitFeedback({ sentiment: 5, role: 'organizer', message: 'ok', address: 'GABC' });
-    expect(feedbackHistory()[0].address).toBe('GABC');
+  it('labels every role the contract encodes', () => {
+    const roles: Role[] = ['organizer', 'member', 'exploring'];
+    for (const role of roles) {
+      expect(ROLE_LABELS[role]).toBeTruthy();
+    }
   });
 });

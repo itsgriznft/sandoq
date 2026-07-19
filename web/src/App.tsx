@@ -103,7 +103,7 @@ export default function App() {
 
       {showFeedback ? (
         <main className="page__body">
-          <FeedbackPanel address={wallet.address} onClose={() => setShowFeedback(false)} />
+          <FeedbackPanel wallet={wallet} onClose={() => setShowFeedback(false)} />
         </main>
       ) : showAnalytics ? (
         <main className="page__body">

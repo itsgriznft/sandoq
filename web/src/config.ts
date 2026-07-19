@@ -5,6 +5,10 @@ export const RPC_URL = 'https://soroban-testnet.stellar.org';
 export const FACTORY_ID =
   import.meta.env.VITE_FACTORY_ID ?? 'CBOOAEERB5DOTXXMZKURAVQXJQYTGMCJCSJWYQSPKVEWB5BSE5ZYRQMK';
 
+/** The on-chain feedback registry — see deployments/testnet.json. */
+export const FEEDBACK_ID =
+  import.meta.env.VITE_FEEDBACK_ID ?? 'CA3FBYWIJUJPUSU7I75M343FEDGLXNXPXIF4QUUAKKZK5NZLPETSETO7';
+
 /** Stellar Asset Contract for native XLM on testnet. */
 export const NATIVE_SAC = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
 
