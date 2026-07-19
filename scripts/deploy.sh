@@ -17,6 +17,7 @@ IDENTITY="${2:-deployer}"
 
 CIRCLE_WASM="target/wasm32v1-none/release/circle.wasm"
 FACTORY_WASM="target/wasm32v1-none/release/factory.wasm"
+FEEDBACK_WASM="target/wasm32v1-none/release/feedback.wasm"
 OUT_DIR="deployments"
 OUT="$OUT_DIR/$NETWORK.json"
 
@@ -56,6 +57,12 @@ FACTORY_ID="$(stellar contract deploy \
   --circle_wasm "$CIRCLE_HASH")"
 echo "factory: $FACTORY_ID"
 
+step "Deploying feedback registry"
+FEEDBACK_ID="$(stellar contract deploy \
+  --wasm "$FEEDBACK_WASM" \
+  --source "$IDENTITY" --network "$NETWORK")"
+echo "feedback: $FEEDBACK_ID"
+
 step "Writing $OUT"
 mkdir -p "$OUT_DIR"
 jq -n \
@@ -64,7 +71,8 @@ jq -n \
   --arg token "$TOKEN" \
   --arg circleWasmHash "$CIRCLE_HASH" \
   --arg factoryId "$FACTORY_ID" \
-  '{network: $network, admin: $admin, token: $token, circleWasmHash: $circleWasmHash, factoryId: $factoryId}' \
+  --arg feedbackId "$FEEDBACK_ID" \
+  '{network: $network, admin: $admin, token: $token, circleWasmHash: $circleWasmHash, factoryId: $factoryId, feedbackId: $feedbackId}' \
   > "$OUT"
 cat "$OUT"
 

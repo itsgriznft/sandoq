@@ -6,8 +6,9 @@
 # skips the optimizer — which is enough to compile and test the factory against.
 # CI therefore needs no extra tooling.
 
-CIRCLE_WASM  := target/wasm32v1-none/release/circle.wasm
-FACTORY_WASM := target/wasm32v1-none/release/factory.wasm
+CIRCLE_WASM   := target/wasm32v1-none/release/circle.wasm
+FACTORY_WASM  := target/wasm32v1-none/release/factory.wasm
+FEEDBACK_WASM := target/wasm32v1-none/release/feedback.wasm
 
 STELLAR := $(shell command -v stellar 2>/dev/null)
 ifdef STELLAR
@@ -16,17 +17,21 @@ else
   BUILD := cargo build --locked --target wasm32v1-none --release --package
 endif
 
-.PHONY: all build circle factory test fmt clean
+.PHONY: all build circle factory feedback test fmt clean
 
 all: build
 
-build: factory
+build: factory feedback
 
 circle:
 	$(BUILD) circle
 
 factory: circle
 	$(BUILD) factory
+
+# The feedback registry is standalone — no contractimport, no ordering.
+feedback:
+	$(BUILD) feedback
 
 test: circle
 	cargo test --locked

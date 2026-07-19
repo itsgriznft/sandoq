@@ -653,6 +653,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "feedback"
+version = "0.0.0"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
 name = "ff"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
