@@ -16,7 +16,7 @@ organizer, ever holds the money.**
 Built for **Level 4 — Green Belt** of the [Stellar Journey to Mastery](https://www.risein.com/programs/stellar-journey-to-mastery-monthly-builder-challenges)
 builder challenge. Idea approved by the Stellar Builder Team before development began.
 
-**Live demo:** https://itsgriznft.github.io/sandoq/
+**Live demo:** https://itsgriznft.github.io/sandoq/ · **New here?** [Join a circle in 5 minutes →](ONBOARDING.md)
 
 ---
 
