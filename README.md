@@ -62,14 +62,20 @@ trades trust for locked capital:
 |---|---|---|
 | `0` | High — a miss immediately shrinks the pot | Family, close friends |
 | `1× contribution` | Moderate — covers a member's occasional missed round | A workplace, a neighbourhood, a Telegram group |
-| `(size − 1) × contribution` | **None** — fully trustless | Strangers |
+| `size × contribution` | **None** — fully trustless | Strangers |
 
-Why `(size − 1) × contribution` is fully trustless: the worst case is a member who takes the pot in
-the **first** round and never pays again — after receiving, they still owe a contribution for each
-of the remaining `size − 1` rounds. Collateral that large covers exactly those missed payments, so
-**even a total stranger who takes the pot and walks leaves everyone else whole.** The cost is that
-trustlessness means locking up more capital up front — the same trade every over-collateralized
-DeFi position makes.
+Why `size × contribution` is fully trustless: over the whole circle each member owes one
+contribution in every one of the `size` rounds — `size × contribution` in total. A member keeps
+their payout turn even if they default (the miss is taken from their collateral), so the worst case
+is someone who takes the pot in the first round and then never pays cash again — their entire
+obligation falls on collateral. Staking the full `size × contribution` covers every one of those
+rounds, so **even a total stranger who grabs the pot and walks leaves everyone else whole.** For a
+4-seat circle at 100 XLM a round that's 400 XLM staked — the size of the pot itself. The cost of
+trustlessness is locking up that much up front, the same trade every over-collateralized DeFi
+position makes.
+
+> A future refinement can lower this to `(size − 1) × contribution` by requiring a member to have
+> paid their own round in cash before they can receive — a design choice on the roadmap.
 
 So Sandoq doesn't manufacture trust between strangers; it **removes the need for a trusted
 organizer** and lets each circle pick where it sits on that dial. That widens who can safely run a
