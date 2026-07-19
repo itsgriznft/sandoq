@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import { ActivityFeed } from './components/ActivityFeed';
 import { AnalyticsPanel } from './components/AnalyticsPanel';
+import { FeedbackPanel } from './components/FeedbackPanel';
 import { CircleCard } from './components/CircleCard';
 import { CircleDetail } from './components/CircleDetail';
 import { CreateCircleForm } from './components/CreateCircleForm';
@@ -45,6 +46,7 @@ export default function App() {
   const [selected, select] = useHashRoute();
   const [creating, setCreating] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [progress, setProgress] = useState<TxProgress>({ stage: 'idle' });
   const feed = useCircleEventsFeed(sandoq.listing.map((row) => row.address));
 
@@ -99,7 +101,11 @@ export default function App() {
         />
       )}
 
-      {showAnalytics ? (
+      {showFeedback ? (
+        <main className="page__body">
+          <FeedbackPanel address={wallet.address} onClose={() => setShowFeedback(false)} />
+        </main>
+      ) : showAnalytics ? (
         <main className="page__body">
           <AnalyticsPanel stats={sandoq.stats} onClose={() => setShowAnalytics(false)} />
         </main>
@@ -173,9 +179,22 @@ export default function App() {
         {' · '}
         <button
           className="link-button"
-          onClick={() => setShowAnalytics((open) => !open)}
+          onClick={() => {
+            setShowFeedback(false);
+            setShowAnalytics((open) => !open);
+          }}
         >
           {showAnalytics ? 'Back to circles' : 'Analytics'}
+        </button>
+        {' · '}
+        <button
+          className="link-button"
+          onClick={() => {
+            setShowAnalytics(false);
+            setShowFeedback((open) => !open);
+          }}
+        >
+          {showFeedback ? 'Back to circles' : 'Give feedback'}
         </button>
       </footer>
     </div>

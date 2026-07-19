@@ -31,6 +31,7 @@ export type AnalyticsEvent =
   | 'settled'
   | 'reclaimed'
   | 'tx_failed'
+  | 'feedback'
   | 'error';
 
 export interface TrackedEvent {
