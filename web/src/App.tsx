@@ -65,16 +65,29 @@ export default function App() {
   return (
     <div className="page">
       <header className="page__header">
-        <div>
-          <h1>Sandoq</h1>
-          <p className="muted">
-            Rotating savings circles — sandoq, esusu, chit fund, tanda — with the trust moved into
-            a contract. Factory{' '}
-            <a href={contractUrl(FACTORY_ID)} target="_blank" rel="noreferrer">
-              {shortAddress(FACTORY_ID)}
-            </a>{' '}
-            · Soroban testnet
-          </p>
+        <div className="brand">
+          <span className="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" width="42" height="42" fill="none">
+              <circle cx="24" cy="24" r="13" stroke="currentColor" strokeWidth="2.4" strokeOpacity="0.3" />
+              <circle cx="24" cy="11" r="4.2" fill="currentColor" />
+              <circle cx="37" cy="24" r="4.2" fill="#4a5165" />
+              <circle cx="24" cy="37" r="4.2" fill="#4a5165" />
+              <circle cx="11" cy="24" r="4.2" fill="#4a5165" />
+              <path d="M24 18.5 A5.5 5.5 0 1 1 18.7 25.4" stroke="currentColor" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+              <path d="M18.2 21.6 L18.5 25.9 L22.1 24.3 Z" fill="currentColor" />
+            </svg>
+          </span>
+          <div>
+            <h1>Sandoq</h1>
+            <p className="muted">
+              Rotating savings circles — sandoq, esusu, chit fund, tanda — with the trust moved
+              into a contract. Factory{' '}
+              <a href={contractUrl(FACTORY_ID)} target="_blank" rel="noreferrer">
+                {shortAddress(FACTORY_ID)}
+              </a>{' '}
+              · Soroban testnet
+            </p>
+          </div>
         </div>
         <WalletBar wallet={wallet} />
       </header>
