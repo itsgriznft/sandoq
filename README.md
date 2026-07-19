@@ -48,6 +48,37 @@ ends holding **zero**. That invariant is asserted after every settle in the test
 
 ---
 
+## How much trust does a circle need?
+
+A traditional savings circle needs two layers of trust: you trust the **organizer** who holds the
+whole pot, and you trust **every member** to keep paying after they've been paid. In the real world
+the first layer is where circles collapse — the organizer disappears with the money.
+
+Sandoq removes that layer entirely: **the contract holds the funds, so no organizer can touch
+them.** What's left is member-default risk, and that is bounded by **collateral** — a dial that
+trades trust for locked capital:
+
+| Collateral per seat | Trust needed | Who it fits |
+|---|---|---|
+| `0` | High — a miss immediately shrinks the pot | Family, close friends |
+| `1× contribution` | Moderate — covers a member's occasional missed round | A workplace, a neighbourhood, a Telegram group |
+| `(size − 1) × contribution` | **None** — fully trustless | Strangers |
+
+Why `(size − 1) × contribution` is fully trustless: the worst case is a member who takes the pot in
+the **first** round and never pays again — after receiving, they still owe a contribution for each
+of the remaining `size − 1` rounds. Collateral that large covers exactly those missed payments, so
+**even a total stranger who takes the pot and walks leaves everyone else whole.** The cost is that
+trustlessness means locking up more capital up front — the same trade every over-collateralized
+DeFi position makes.
+
+So Sandoq doesn't manufacture trust between strangers; it **removes the need for a trusted
+organizer** and lets each circle pick where it sits on that dial. That widens who can safely run a
+circle — from people who deeply trust each other to loose communities who don't. (A future on-chain
+reputation — an address's record of completed circles — lets even semi-strangers size each other
+up.)
+
+---
+
 ## On-chain artifacts
 
 Everything below is live on Stellar **testnet**.
