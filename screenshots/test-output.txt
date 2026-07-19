@@ -1,0 +1,56 @@
+$ cargo test    # contracts
+
+running 26 tests    # contracts/circle
+test test::constructor_rejects_an_empty_name - should panic ... ok
+test test::constructor_rejects_a_fill_deadline_in_the_past - should panic ... ok
+test test::constructor_rejects_a_circle_of_one - should panic ... ok
+test test::constructor_rejects_a_zero_contribution - should panic ... ok
+test test::state_reports_the_terms_it_was_created_with ... ok
+test test::join_escrows_collateral_and_counts_members ... ok
+test test::joining_the_last_seat_starts_the_circle ... ok
+test test::join_rejects_a_second_seat_for_the_same_member ... ok
+test test::join_rejects_once_the_fill_deadline_passed ... ok
+test test::join_rejects_once_the_circle_started ... ok
+test test::leave_returns_the_collateral_while_filling ... ok
+test test::leave_rejects_non_members_and_running_circles ... ok
+test test::contribute_moves_the_money_and_marks_the_round_paid ... ok
+test test::contribute_emits_the_event_the_frontend_indexes ... ok
+test test::contribute_rejects_paying_twice ... ok
+test test::contribute_rejects_outsiders_and_idle_circles ... ok
+test test::contribute_rejects_after_the_round_window ... ok
+test test::settle_pays_the_first_member_once_everyone_paid ... ok
+test test::settle_rejects_while_the_round_is_still_open ... ok
+test test::settle_rejects_idle_circles ... ok
+test test::settle_covers_a_miss_from_collateral ... ok
+test test::settle_marks_a_default_once_collateral_runs_dry ... ok
+test test::a_defaulted_member_may_still_receive_and_contribute ... ok
+test test::a_full_circle_pays_everyone_once_and_returns_all_collateral ... ok
+test test::a_circle_with_a_deadbeat_stays_solvent_to_the_last_token ... ok
+test test::reclaim_rejects_before_the_circle_completes ... ok
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+running 11 tests    # contracts/factory
+test test::create_deploys_a_live_circle_contract ... ok
+test test::create_validates_its_arguments ... ok
+test test::create_accepts_a_name_at_the_length_limit ... ok
+test test::each_circle_gets_its_own_address_even_from_one_organizer ... ok
+test test::a_factory_deployed_circle_runs_a_full_rotation ... ok
+test test::listing_reads_state_from_every_circle ... ok
+test test::listing_pages_through_circles ... ok
+test test::stats_aggregate_across_circles ... ok
+test test::stats_on_an_empty_factory_are_zero ... ok
+test test::is_circle_rejects_addresses_the_factory_did_not_deploy ... ok
+test test::set_circle_wasm_redirects_future_deployments ... ok
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+$ npm test --prefix web    # frontend
+
+ ✓ src/config.test.ts        (15 tests)
+ ✓ src/lib/circle.test.ts     (3 tests)
+ ✓ src/lib/errors.test.ts    (13 tests)
+ ✓ src/lib/analytics.test.ts  (5 tests)
+
+ Test Files  4 passed (4)
+      Tests  36 passed (36)
+
+# 37 contract tests + 36 frontend tests — all green.
