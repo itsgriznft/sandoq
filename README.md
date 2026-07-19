@@ -55,6 +55,7 @@ Everything below is live on Stellar **testnet**.
 | | |
 |---|---|
 | **Factory contract** | [`CBOOAEERB5DOTXXMZKURAVQXJQYTGMCJCSJWYQSPKVEWB5BSE5ZYRQMK`](https://stellar.expert/explorer/testnet/contract/CBOOAEERB5DOTXXMZKURAVQXJQYTGMCJCSJWYQSPKVEWB5BSE5ZYRQMK) |
+| **Feedback registry** | [`CA3FBYWIJUJPUSU7I75M343FEDGLXNXPXIF4QUUAKKZK5NZLPETSETO7`](https://stellar.expert/explorer/testnet/contract/CA3FBYWIJUJPUSU7I75M343FEDGLXNXPXIF4QUUAKKZK5NZLPETSETO7) |
 | **Circle wasm hash** | `369136f10712e04c6af13b5804aa27b56d11b58768b3d1aa1bc62739c7ec8db7` |
 | **Pilot circle** (factory-deployed) | [`CCZG3DK2QP7RE76NFCLTVWVOASFYOV2X4VYN52OXQBTXHSBPT6GWJJRW`](https://stellar.expert/explorer/testnet/contract/CCZG3DK2QP7RE76NFCLTVWVOASFYOV2X4VYN52OXQBTXHSBPT6GWJJRW) |
 | **`create`, from the factory** | [`41a69f5fca8c05d8efe404967456e3bbd6e7a5797782a9af3bfdf5dce63f50e2`](https://stellar.expert/explorer/testnet/tx/41a69f5fca8c05d8efe404967456e3bbd6e7a5797782a9af3bfdf5dce63f50e2) |
@@ -96,6 +97,12 @@ stream that also captures errors.
 
 ![Analytics](screenshots/03-analytics.png)
 
+**Feedback — on-chain and verifiable.** Every response is a signed transaction to the feedback
+registry, so the community summary is read straight from the ledger, with each note's author
+linked to Stellar Expert.
+
+![Feedback](screenshots/08-feedback.png)
+
 **Mobile** — single column, 44px targets, no horizontal scroll at any width from 320px up.
 
 <p>
@@ -103,12 +110,12 @@ stream that also captures errors.
   <img src="screenshots/05-mobile-detail.png" alt="Circle detail on mobile" width="300">
 </p>
 
-**CI/CD** — every push runs `cargo fmt --check`, the ordered contract build, 37 contract tests,
-then the frontend's lint, 36 tests, and production build. `main` deploys to GitHub Pages.
+**CI/CD** — every push runs `cargo fmt --check`, the ordered contract build, 47 contract tests,
+then the frontend's lint, 38 tests, and production build. `main` deploys to GitHub Pages.
 
 ![CI pipeline](screenshots/06-ci-pipeline.png)
 
-**Tests** — 37 contract tests and 36 frontend tests, all green. Full output in
+**Tests** — 47 contract tests and 38 frontend tests, all green. Full output in
 [screenshots/test-output.txt](screenshots/test-output.txt).
 
 ![Test output](screenshots/07-test-output.png)
@@ -181,6 +188,26 @@ Events: `joined`, `left`, `started`, `contributed`, `slashed`, `paid_out`, `comp
 | `stats()` | — | Totals across the circles: counts by status, members, XLM committed per rotation |
 | `circles()` / `is_circle(address)` | — | What this factory deployed |
 | `set_circle_wasm(wasm)` | admin | Redirects *future* deployments; existing circles are untouched |
+
+### `contracts/feedback`
+
+A standalone registry that makes user feedback a **public, verifiable ledger record** rather than
+something the team asserts. Submitting is a signed transaction, so each response carries its own tx
+hash and author address.
+
+| Function | Auth | Description |
+|---|---|---|
+| `submit(author, sentiment, role, note)` | author | Stores one entry under the author (1–5 sentiment, role, ≤280-char note); re-submitting updates in place. Emits `submitted` |
+| `summary()` | — | Distinct-author count, summed sentiment (for the average), and the role breakdown |
+| `list(start, limit)` / `entry(addr)` / `count()` / `authors()` | — | Reads for the community view |
+
+One entry per address, so the **count equals the number of distinct people** who left feedback —
+which is exactly the "proof of user interactions" a reviewer can verify. Read it yourself:
+
+```bash
+stellar contract invoke --id CA3FBYWIJUJPUSU7I75M343FEDGLXNXPXIF4QUUAKKZK5NZLPETSETO7 \
+  --source <any> --network testnet -- summary
+```
 
 ---
 
@@ -310,7 +337,7 @@ rustup target add wasm32v1-none
 
 ```bash
 make build   # circle wasm first, then factory — the order matters
-make test    # 37 unit tests
+make test    # 47 unit tests
 ```
 
 > The factory embeds the circle's contract spec via `contractimport!`, so the circle wasm must exist
@@ -340,7 +367,7 @@ Amounts are in **stroops** (1 XLM = 10,000,000 stroops); `period` and `fill_dead
 cd web
 npm install
 npm run dev      # http://localhost:5173
-npm test         # 36 unit tests
+npm test         # 38 unit tests
 npm run lint
 ```
 

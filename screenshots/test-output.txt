@@ -43,14 +43,28 @@ test test::is_circle_rejects_addresses_the_factory_did_not_deploy ... ok
 test test::set_circle_wasm_redirects_future_deployments ... ok
 test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
 
+running 10 tests    # contracts/feedback
+test test::submit_records_an_entry_and_counts_the_author ... ok
+test test::counts_only_distinct_authors ... ok
+test test::resubmitting_updates_in_place_without_inflating_the_count ... ok
+test test::submit_emits_the_event_the_frontend_indexes ... ok
+test test::submit_rejects_a_sentiment_out_of_range ... ok
+test test::submit_rejects_an_unknown_role ... ok
+test test::submit_rejects_a_note_past_the_limit ... ok
+test test::list_pages_through_entries ... ok
+test test::summary_aggregates_sentiment_and_roles ... ok
+test test::summary_of_an_empty_registry_is_zero ... ok
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
 $ npm test --prefix web    # frontend
 
- ✓ src/config.test.ts        (15 tests)
- ✓ src/lib/circle.test.ts     (3 tests)
- ✓ src/lib/errors.test.ts    (13 tests)
- ✓ src/lib/analytics.test.ts  (5 tests)
+ ✓ src/config.test.ts         (15 tests)
+ ✓ src/lib/circle.test.ts      (3 tests)
+ ✓ src/lib/errors.test.ts     (13 tests)
+ ✓ src/lib/analytics.test.ts   (5 tests)
+ ✓ src/lib/feedback.test.ts    (2 tests)
 
- Test Files  4 passed (4)
-      Tests  36 passed (36)
+ Test Files  5 passed (5)
+      Tests  38 passed (38)
 
-# 37 contract tests + 36 frontend tests — all green.
+# 47 contract tests + 38 frontend tests — all green.

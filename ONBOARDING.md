@@ -37,8 +37,10 @@ and takes your seat.
 
 ## 6. Tell us what you think
 
-Tap **Give feedback** in the footer — an emoji and one line is plenty. It helps
-shape what Sandoq builds next.
+Tap **Give feedback** in the footer — pick an emoji, say what you did, add a line
+if you like, and sign. Your feedback is stored **on-chain**, so it becomes a
+public, verifiable record (and one more real wallet interaction). An emoji and a
+signature is plenty.
 
 ---
 
