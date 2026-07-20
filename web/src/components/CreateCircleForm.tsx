@@ -35,6 +35,7 @@ export function CreateCircleForm({ wallet, progress, onProgress, onCreated, onCa
   const [size, setSize] = useState(5);
   const [collateral, setCollateral] = useState('25');
   const [fillDays, setFillDays] = useState(7);
+  const [isPrivate, setIsPrivate] = useState(false);
 
   // Remember how far the transaction got, so a failure can say where it
   // stopped instead of greying out stages that actually succeeded.
@@ -98,6 +99,7 @@ export function CreateCircleForm({ wallet, progress, onProgress, onCreated, onCa
         size,
         collateralStroops,
         fillDeadline,
+        isPrivate,
         (xdr) => signTransaction(xdr, wallet.address!),
         report,
       );
@@ -213,6 +215,31 @@ export function CreateCircleForm({ wallet, progress, onProgress, onCreated, onCa
             ))}
           </div>
           <small className="muted">Not full by then? Everyone leaves with their stake.</small>
+        </fieldset>
+
+        <fieldset className="field" disabled={disabled}>
+          <span>Who can join?</span>
+          <div className="chips">
+            <button
+              type="button"
+              className={`chip ${!isPrivate ? 'chip--active' : ''}`}
+              onClick={() => setIsPrivate(false)}
+            >
+              Public — anyone
+            </button>
+            <button
+              type="button"
+              className={`chip ${isPrivate ? 'chip--active' : ''}`}
+              onClick={() => setIsPrivate(true)}
+            >
+              Invite-only
+            </button>
+          </div>
+          <small className="muted">
+            {isPrivate
+              ? "You'll invite members by address from the circle page after it's created."
+              : 'Anyone with the link can take a seat.'}
+          </small>
         </fieldset>
 
         <button type="submit" className="button button--primary" disabled={disabled}>

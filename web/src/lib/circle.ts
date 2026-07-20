@@ -1,4 +1,4 @@
-import { nativeToScVal, rpc, scValToNative, type xdr } from '@stellar/stellar-sdk';
+import { nativeToScVal, rpc, scValToNative, xdr } from '@stellar/stellar-sdk';
 
 import { NATIVE_SAC } from '../config';
 import { statusFrom, type CircleStatus } from './factory';
@@ -14,6 +14,7 @@ export interface CircleState {
   size: number;
   collateral: bigint;
   fillDeadline: bigint;
+  private: boolean;
   status: CircleStatus;
   members: number;
   start: bigint;
@@ -46,6 +47,7 @@ export async function readCircleState(circle: string): Promise<CircleState> {
     size: Number(raw.size),
     collateral: BigInt(raw.collateral as bigint),
     fillDeadline: BigInt(raw.fill_deadline as bigint),
+    private: Boolean(raw.private),
     status: statusFrom(raw.status),
     members: Number(raw.members),
     start: BigInt(raw.start as bigint),
@@ -114,6 +116,24 @@ export async function leave(
   onStage: (progress: TxProgress) => void,
 ): Promise<string> {
   const { hash } = await invoke(member, circle, 'leave', [addressArg(member)], sign, onStage);
+  return hash;
+}
+
+/** Whether an address may join — always true on a public circle. */
+export async function readCanJoin(circle: string, address: string): Promise<boolean> {
+  return Boolean(await simulate(circle, 'can_join', addressArg(address)));
+}
+
+/** Organizer-only: invite addresses to a private circle. */
+export async function allow(
+  circle: string,
+  organizer: string,
+  members: string[],
+  sign: Signer,
+  onStage: (progress: TxProgress) => void,
+): Promise<string> {
+  const arg = xdr.ScVal.scvVec(members.map((m) => addressArg(m)));
+  const { hash } = await invoke(organizer, circle, 'allow', [arg], sign, onStage);
   return hash;
 }
 

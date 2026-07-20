@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   contractUrl,
@@ -33,10 +33,30 @@ export function CircleDetail({
 }) {
   const watch = useCircle(address);
   const [progress, setProgress] = useState<TxProgress>({ stage: 'idle' });
+  // Whether the connected wallet may join — always true on a public circle,
+  // checked on-chain for a private one.
+  const [canJoin, setCanJoin] = useState(true);
 
   // Remember how far a transaction got, so a failure can say where it stopped
   // instead of greying out stages that actually succeeded.
   const reachedStage = useRef<TxStage>('idle');
+
+  const isPrivate = watch.state?.private ?? false;
+  useEffect(() => {
+    if (!wallet.address || !isPrivate) {
+      setCanJoin(true);
+      return;
+    }
+    let cancelled = false;
+    circle
+      .readCanJoin(address, wallet.address)
+      .then((ok) => !cancelled && setCanJoin(ok))
+      .catch(() => !cancelled && setCanJoin(false));
+    return () => {
+      cancelled = true;
+    };
+    // Re-check after each sync (an invite may have just landed).
+  }, [address, wallet.address, isPrivate, watch.syncedAt]);
 
   const banner = progress.error ?? (watch.state ? null : watch.error);
   const busy = ['simulating', 'signing', 'submitting', 'confirming'].includes(progress.stage);
@@ -96,6 +116,7 @@ export function CircleDetail({
                 seats={watch.seats}
                 wallet={wallet}
                 busy={busy}
+                canJoin={canJoin}
                 onJoin={() => run('joined', (sign) => circle.join(address, wallet.address!, sign, report))}
                 onLeave={() => run('left', (sign) => circle.leave(address, wallet.address!, sign, report))}
                 onContribute={() =>
@@ -106,6 +127,9 @@ export function CircleDetail({
                 }
                 onReclaim={() =>
                   run('reclaimed', (sign) => circle.reclaim(address, wallet.address!, sign, report))
+                }
+                onInvite={(members) =>
+                  run('invited', (sign) => circle.allow(address, wallet.address!, members, sign, report))
                 }
               />
               <TxStatus progress={progress} />
@@ -140,7 +164,14 @@ function Header({
   return (
     <section className="card circle">
       <header className="circle__header">
-        <h2>{state.name}</h2>
+        <h2>
+          {state.private && (
+            <span className="lock" title="Invite-only" aria-label="Invite-only">
+              🔒{' '}
+            </span>
+          )}
+          {state.name}
+        </h2>
         <StatusPill status={state.status} fillDeadline={state.fillDeadline} />
       </header>
 
@@ -214,21 +245,25 @@ function Actions({
   seats,
   wallet,
   busy,
+  canJoin,
   onJoin,
   onLeave,
   onContribute,
   onSettle,
   onReclaim,
+  onInvite,
 }: {
   state: CircleState;
   seats: Seat[];
   wallet: Wallet;
   busy: boolean;
+  canJoin: boolean;
   onJoin: () => void;
   onLeave: () => void;
   onContribute: () => void;
   onSettle: () => void;
   onReclaim: () => void;
+  onInvite: (members: string[]) => void;
 }) {
   const you = wallet.address;
   const yourSeat = you ? seats.find((seat) => seat.address === you) : undefined;
@@ -245,12 +280,26 @@ function Actions({
   const windowOver = isClosed(roundEnd(state));
   const allPaid = state.paidThisRound >= state.size;
   const settleReady = state.status === 'active' && (windowOver || allPaid);
+  const isOrganizer = you === state.organizer;
+  const blockedByInvite = state.private && !canJoin && !yourSeat;
 
   return (
     <section className="card actions">
       <h3>Take part</h3>
 
-      {state.status === 'filling' && !yourSeat && !isClosed(state.fillDeadline) && (
+      {/* Organizer of a private circle can invite members while it fills. */}
+      {state.status === 'filling' && state.private && isOrganizer && (
+        <InviteBox onInvite={onInvite} busy={busy} />
+      )}
+
+      {state.status === 'filling' && blockedByInvite && !isClosed(state.fillDeadline) && (
+        <p className="muted">
+          🔒 This circle is invite-only. Ask the organizer ({shortAddress(state.organizer)}) to add
+          your address, then refresh.
+        </p>
+      )}
+
+      {state.status === 'filling' && !yourSeat && !blockedByInvite && !isClosed(state.fillDeadline) && (
         <>
           <p className="muted">
             Joining stakes {formatXlm(state.collateral)} XLM as collateral. It comes back when the
@@ -388,5 +437,48 @@ function Seats({ state, seats, you }: { state: CircleState; seats: Seat[]; you: 
         ))}
       </ol>
     </section>
+  );
+}
+
+/** Organizer-only box for inviting addresses to a private circle. */
+function InviteBox({ onInvite, busy }: { onInvite: (members: string[]) => void; busy: boolean }) {
+  const [text, setText] = useState('');
+
+  // Split on commas or whitespace; keep only well-formed Stellar addresses.
+  const addresses = text
+    .split(/[\s,]+/)
+    .map((a) => a.trim())
+    .filter((a) => /^G[A-Z2-7]{55}$/.test(a));
+
+  return (
+    <div className="invite">
+      <p className="muted">
+        You&apos;re the organizer of this invite-only circle. Paste the wallet addresses you want to
+        let in — one or many.
+      </p>
+      <textarea
+        className="feedback-textarea"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="GA…  GB…  (comma or newline separated)"
+        rows={2}
+        disabled={busy}
+      />
+      <div className="invite__row">
+        <small className="muted">
+          {addresses.length} valid address{addresses.length === 1 ? '' : 'es'}
+        </small>
+        <button
+          className="button button--primary"
+          onClick={() => {
+            onInvite(addresses);
+            setText('');
+          }}
+          disabled={busy || addresses.length === 0}
+        >
+          {busy ? 'Working…' : `Invite ${addresses.length || ''}`.trim()}
+        </button>
+      </div>
+    </div>
   );
 }

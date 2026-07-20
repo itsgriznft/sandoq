@@ -3,7 +3,7 @@ export const RPC_URL = 'https://soroban-testnet.stellar.org';
 
 /** Deployed by `scripts/deploy.sh` — see deployments/testnet.json. */
 export const FACTORY_ID =
-  import.meta.env.VITE_FACTORY_ID ?? 'CBOOAEERB5DOTXXMZKURAVQXJQYTGMCJCSJWYQSPKVEWB5BSE5ZYRQMK';
+  import.meta.env.VITE_FACTORY_ID ?? 'CB73QYCRM7BXR52W6FUTNCF6SVLAD26QTLUJCPMOKVKI7A6FPGNBVHRC';
 
 /** The on-chain feedback registry — see deployments/testnet.json. */
 export const FEEDBACK_ID =

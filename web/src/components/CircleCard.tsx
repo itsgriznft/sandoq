@@ -21,7 +21,14 @@ export function CircleCard({ row, onOpen }: { row: Row; onOpen: () => void }) {
     <article className="card circle-card" onClick={onOpen} role="button" tabIndex={0}
       onKeyDown={(event) => event.key === 'Enter' && onOpen()}>
       <header className="circle-card__header">
-        <h3>{row.name}</h3>
+        <h3>
+          {row.private && (
+            <span className="lock" title="Invite-only" aria-label="Invite-only">
+              🔒{' '}
+            </span>
+          )}
+          {row.name}
+        </h3>
         <StatusPill status={row.status} fillDeadline={row.fillDeadline} />
       </header>
 

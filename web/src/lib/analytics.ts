@@ -27,6 +27,7 @@ export type AnalyticsEvent =
   | 'circle_created'
   | 'joined'
   | 'left'
+  | 'invited'
   | 'contributed'
   | 'settled'
   | 'reclaimed'

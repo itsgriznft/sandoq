@@ -19,6 +19,7 @@ export interface Row {
   size: number;
   collateral: bigint;
   fillDeadline: bigint;
+  private: boolean;
   status: CircleStatus;
   members: number;
   start: bigint;
@@ -59,6 +60,7 @@ export async function readListing(start = 0, limit = 50): Promise<Row[]> {
     size: Number(row.size),
     collateral: BigInt(row.collateral as bigint),
     fillDeadline: BigInt(row.fill_deadline as bigint),
+    private: Boolean(row.private),
     status: statusFrom(row.status),
     members: Number(row.members),
     start: BigInt(row.start as bigint),
@@ -93,6 +95,7 @@ export async function createCircle(
   size: number,
   collateralStroops: bigint,
   fillDeadlineSeconds: bigint,
+  isPrivate: boolean,
   sign: Signer,
   onStage: (progress: TxProgress) => void,
 ): Promise<{ hash: string; address: string }> {
@@ -108,6 +111,7 @@ export async function createCircle(
       nativeToScVal(size, { type: 'u32' }),
       nativeToScVal(collateralStroops, { type: 'i128' }),
       nativeToScVal(fillDeadlineSeconds, { type: 'u64' }),
+      nativeToScVal(isPrivate),
     ],
     sign,
     onStage,
