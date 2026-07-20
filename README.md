@@ -85,17 +85,40 @@ up.)
 
 ---
 
+## Who Sandoq is for
+
+Being honest about this matters more than overclaiming.
+
+**Sandoq is for people who already trust each other** — a family, coworkers, a neighbourhood, a
+diaspora group, an online community. That's who runs savings circles in the real world, and it's who
+gains here. Trusted circles keep low or zero collateral, so the early receiver still gets a genuine
+interest-free lump sum — and Sandoq removes the three things that actually break these circles:
+
+- **The organizer can't run off with the pot** — the contract holds every stake and pays every
+  payout. This is the failure that sinks real circles.
+- **No notebook, no disputes** — every contribution and payout is on the ledger.
+- **It works across borders** — a diaspora can run a circle with family back home; a notebook can't
+  cross a border.
+
+**It is not, honestly, a fit for total strangers.** Full trustlessness needs collateral equal to the
+whole pot, which cancels the interest-free-loan benefit that draws people to circles in the first
+place — the tension every on-chain ROSCA runs into. So the sweet spot is **low collateral among
+people with some connection**, made safe by invite-only circles and no-custody escrow — not
+"trustless among anonymous strangers". The realistic first users are crypto-comfortable communities
+and diaspora groups; bridging to the unbanked savers who use offline circles today (anchor
+on/off-ramps, on-chain reputation) is the roadmap, not the MVP's claim.
+
+---
+
 ## On-chain artifacts
 
 Everything below is live on Stellar **testnet**.
 
 | | |
 |---|---|
-| **Factory contract** | [`CBOOAEERB5DOTXXMZKURAVQXJQYTGMCJCSJWYQSPKVEWB5BSE5ZYRQMK`](https://stellar.expert/explorer/testnet/contract/CBOOAEERB5DOTXXMZKURAVQXJQYTGMCJCSJWYQSPKVEWB5BSE5ZYRQMK) |
+| **Factory contract** | [`CB73QYCRM7BXR52W6FUTNCF6SVLAD26QTLUJCPMOKVKI7A6FPGNBVHRC`](https://stellar.expert/explorer/testnet/contract/CB73QYCRM7BXR52W6FUTNCF6SVLAD26QTLUJCPMOKVKI7A6FPGNBVHRC) |
 | **Feedback registry** | [`CA3FBYWIJUJPUSU7I75M343FEDGLXNXPXIF4QUUAKKZK5NZLPETSETO7`](https://stellar.expert/explorer/testnet/contract/CA3FBYWIJUJPUSU7I75M343FEDGLXNXPXIF4QUUAKKZK5NZLPETSETO7) |
-| **Circle wasm hash** | `369136f10712e04c6af13b5804aa27b56d11b58768b3d1aa1bc62739c7ec8db7` |
-| **Pilot circle** (factory-deployed) | [`CCZG3DK2QP7RE76NFCLTVWVOASFYOV2X4VYN52OXQBTXHSBPT6GWJJRW`](https://stellar.expert/explorer/testnet/contract/CCZG3DK2QP7RE76NFCLTVWVOASFYOV2X4VYN52OXQBTXHSBPT6GWJJRW) |
-| **`create`, from the factory** | [`41a69f5fca8c05d8efe404967456e3bbd6e7a5797782a9af3bfdf5dce63f50e2`](https://stellar.expert/explorer/testnet/tx/41a69f5fca8c05d8efe404967456e3bbd6e7a5797782a9af3bfdf5dce63f50e2) |
+| **Circle wasm hash** | `fc15146964f85655377da7839713e7f78aebce9009d1dc43590c38496090d32f` |
 | **Circle token** | Native XLM, via its Stellar Asset Contract |
 
 The recorded wasm hash is reproducible: `make build` on this tree produces a `circle.wasm` whose
@@ -210,7 +233,12 @@ contract afterwards — the factory cannot touch its funds.
 | `contribute(member)` | member | Pays the current round; only inside its window, only once |
 | `settle()` | — | Permissionless crank: covers misses from collateral, pays the pot to the round's member, rotates |
 | `reclaim(member)` | member | Returns surviving collateral once the circle completes |
-| `state()` / `members()` / `member(addr)` / `has_paid(round, addr)` | — | Reads for the frontend |
+| `allow(members)` | organizer | Invites addresses to a *private* circle, while filling |
+| `state()` / `members()` / `member(addr)` / `has_paid(round, addr)` / `can_join(addr)` | — | Reads for the frontend |
+
+A circle can be **public** (anyone joins) or **invite-only** (`private`). On a private circle only
+the organizer and addresses they `allow()` may `join`; everyone else is rejected with `NotAllowed`.
+This is what makes Sandoq usable by a real group — you invite your circle, not the open internet.
 
 Events: `joined`, `left`, `started`, `contributed`, `slashed`, `paid_out`, `completed`,
 `reclaimed` — each carrying the member address as an indexed topic where it has one.
