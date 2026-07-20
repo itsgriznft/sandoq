@@ -66,6 +66,7 @@ fn create(s: &Setup, organizer: &Address, label: &str, size: u32) -> Address {
         &size,
         &50,
         &s.fill_deadline,
+        &false,
     )
 }
 
@@ -151,6 +152,7 @@ fn create_validates_its_arguments() {
             &3,
             &50,
             &s.fill_deadline,
+            &false,
         ),
         Error::NameEmpty,
     );
@@ -163,6 +165,7 @@ fn create_validates_its_arguments() {
             &3,
             &50,
             &s.fill_deadline,
+            &false,
         ),
         Error::NameTooLong,
     );
@@ -175,6 +178,7 @@ fn create_validates_its_arguments() {
             &3,
             &50,
             &s.fill_deadline,
+            &false,
         ),
         Error::InvalidContribution,
     );
@@ -187,6 +191,7 @@ fn create_validates_its_arguments() {
             &3,
             &50,
             &s.fill_deadline,
+            &false,
         ),
         Error::InvalidPeriod,
     );
@@ -199,6 +204,7 @@ fn create_validates_its_arguments() {
             &1,
             &50,
             &s.fill_deadline,
+            &false,
         ),
         Error::InvalidSize,
     );
@@ -211,6 +217,7 @@ fn create_validates_its_arguments() {
             &25,
             &50,
             &s.fill_deadline,
+            &false,
         ),
         Error::InvalidSize,
     );
@@ -223,6 +230,7 @@ fn create_validates_its_arguments() {
             &3,
             &-1,
             &s.fill_deadline,
+            &false,
         ),
         Error::InvalidCollateral,
     );
@@ -235,6 +243,7 @@ fn create_validates_its_arguments() {
             &3,
             &50,
             &s.env.ledger().timestamp(),
+            &false,
         ),
         Error::InvalidDeadline,
     );
@@ -253,6 +262,7 @@ fn create_accepts_a_name_at_the_length_limit() {
         &3,
         &50,
         &s.fill_deadline,
+        &false,
     );
     assert!(s.factory.is_circle(&address));
 }
@@ -358,6 +368,28 @@ fn set_circle_wasm_redirects_future_deployments() {
             &3,
             &50,
             &s.fill_deadline,
+            &false,
         )
         .is_err());
+}
+
+#[test]
+fn create_can_deploy_a_private_circle() {
+    let s = setup();
+    let address = s.factory.create(
+        &s.alice,
+        &name(&s.env, "Invite only"),
+        &100,
+        &WEEK,
+        &3,
+        &50,
+        &s.fill_deadline,
+        &true, // private
+    );
+
+    let c = circle::Client::new(&s.env, &address);
+    assert!(c.state().private);
+    // A stranger cannot join; the organizer can.
+    assert!(!c.can_join(&s.bob));
+    assert!(c.can_join(&s.alice));
 }

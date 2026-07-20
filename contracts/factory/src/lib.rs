@@ -72,6 +72,7 @@ pub struct Row {
     pub size: u32,
     pub collateral: i128,
     pub fill_deadline: u64,
+    pub private: bool,
     pub status: Status,
     pub members: u32,
     pub start: u64,
@@ -165,6 +166,7 @@ impl Factory {
         size: u32,
         collateral: i128,
         fill_deadline: u64,
+        private: bool,
     ) -> Result<Address, Error> {
         organizer.require_auth();
         Self::bump(&env);
@@ -208,6 +210,7 @@ impl Factory {
                     size,
                     collateral,
                     fill_deadline,
+                    private,
                 ),
             );
 
@@ -271,6 +274,7 @@ impl Factory {
                 size: state.size,
                 collateral: state.collateral,
                 fill_deadline: state.fill_deadline,
+                private: state.private,
                 status: state.status,
                 members: state.members,
                 start: state.start,

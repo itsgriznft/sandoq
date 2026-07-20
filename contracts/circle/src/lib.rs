@@ -47,6 +47,7 @@ pub enum Error {
     SettleTooEarly = 15,
     NotComplete = 16,
     NothingToReclaim = 17,
+    NotAllowed = 18,
 }
 
 const MAX_NAME_LEN: u32 = 64;
@@ -83,6 +84,8 @@ pub struct Config {
     pub collateral: i128,
     /// If the circle has not filled by then, everyone can walk away.
     pub fill_deadline: u64,
+    /// When true, only the organizer and addresses they allow may join.
+    pub private: bool,
 }
 
 /// A member's standing, kept per address.
@@ -111,6 +114,8 @@ pub struct State {
     pub size: u32,
     pub collateral: i128,
     pub fill_deadline: u64,
+    /// Only the organizer and allowed addresses may join when true.
+    pub private: bool,
     pub status: Status,
     /// Members joined so far (equals `size` once active).
     pub members: u32,
@@ -132,6 +137,7 @@ pub enum DataKey {
     PaidCount,
     Member(Address),
     Paid(u32, Address),
+    Allowed(Address),
 }
 
 /// Topics: `("joined", member)`. Data: `{ members }`.
@@ -157,6 +163,14 @@ pub struct Left {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Started {
     pub start: u64,
+}
+
+/// Topics: `("allowed", member)`. Data: `{}`. The organizer invited an address.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Allowed {
+    #[topic]
+    pub member: Address,
 }
 
 /// Topics: `("contributed", member)`. Data: `{ round, amount }`.
@@ -216,6 +230,7 @@ pub struct Circle;
 
 #[contractimpl]
 impl Circle {
+    #[allow(clippy::too_many_arguments)]
     pub fn __constructor(
         env: Env,
         token: Address,
@@ -226,6 +241,7 @@ impl Circle {
         size: u32,
         collateral: i128,
         fill_deadline: u64,
+        private: bool,
     ) {
         if name.len() == 0 {
             panic_with_error!(&env, Error::NameEmpty);
@@ -261,6 +277,7 @@ impl Circle {
                 size,
                 collateral,
                 fill_deadline,
+                private,
             },
         );
         storage.set(&DataKey::Status, &Status::Filling);
@@ -283,6 +300,10 @@ impl Circle {
         let config = Self::config(&env);
         if env.ledger().timestamp() >= config.fill_deadline {
             return Err(Error::FillExpired);
+        }
+        // A private circle admits only the organizer and addresses they invited.
+        if config.private && member != config.organizer && !Self::allowed(&env, &member) {
+            return Err(Error::NotAllowed);
         }
         let mut members = Self::members_list(&env);
         if members.contains(&member) {
@@ -325,6 +346,36 @@ impl Circle {
         }
 
         Ok(members.len())
+    }
+
+    /// Invite one or more addresses to a private circle. Organizer-only, and
+    /// only while filling. A no-op on a public circle beyond recording intent.
+    /// Emits `allowed` per address.
+    pub fn allow(env: Env, members: Vec<Address>) -> Result<(), Error> {
+        let config = Self::config(&env);
+        config.organizer.require_auth();
+        Self::bump(&env);
+
+        if Self::status(&env) != Status::Filling {
+            return Err(Error::NotFilling);
+        }
+
+        for member in members.iter() {
+            let key = DataKey::Allowed(member.clone());
+            env.storage().persistent().set(&key, &true);
+            env.storage()
+                .persistent()
+                .extend_ttl(&key, INSTANCE_THRESHOLD, INSTANCE_TTL);
+            Allowed { member }.publish(&env);
+        }
+        Ok(())
+    }
+
+    /// Whether `member` may join: always on a public circle, and on a private
+    /// one only the organizer and invited addresses.
+    pub fn can_join(env: Env, member: Address) -> bool {
+        let config = Self::config(&env);
+        !config.private || member == config.organizer || Self::allowed(&env, &member)
     }
 
     /// Walk away with the collateral — only while the circle is still filling,
@@ -543,6 +594,7 @@ impl Circle {
             size: config.size,
             collateral: config.collateral,
             fill_deadline: config.fill_deadline,
+            private: config.private,
             status: Self::status(&env),
             members: Self::members_list(&env).len(),
             start: Self::get(&env, &DataKey::Start, 0u64),
@@ -563,6 +615,13 @@ impl Circle {
         env.storage()
             .persistent()
             .get(&DataKey::Paid(round, member))
+            .unwrap_or(false)
+    }
+
+    fn allowed(env: &Env, member: &Address) -> bool {
+        env.storage()
+            .persistent()
+            .get(&DataKey::Allowed(member.clone()))
             .unwrap_or(false)
     }
 

@@ -647,6 +647,14 @@
                           },
                           {
                             "key": {
+                              "symbol": "private"
+                            },
+                            "val": {
+                              "bool": false
+                            }
+                          },
+                          {
+                            "key": {
                               "symbol": "size"
                             },
                             "val": {

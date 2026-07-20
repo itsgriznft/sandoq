@@ -59,6 +59,7 @@ fn setup_with(contribution: i128, collateral: i128) -> Setup {
             SIZE,
             collateral,
             fill_deadline,
+            false, // public
         ),
     );
 
@@ -485,6 +486,7 @@ fn constructor_rejects_a_circle_of_one() {
             1u32,
             COLLATERAL,
             env.ledger().timestamp() + DAY,
+            false,
         ),
     );
 }
@@ -506,6 +508,7 @@ fn constructor_rejects_a_zero_contribution() {
             SIZE,
             COLLATERAL,
             env.ledger().timestamp() + DAY,
+            false,
         ),
     );
 }
@@ -527,6 +530,7 @@ fn constructor_rejects_a_fill_deadline_in_the_past() {
             SIZE,
             COLLATERAL,
             env.ledger().timestamp(),
+            false,
         ),
     );
 }
@@ -548,6 +552,129 @@ fn constructor_rejects_an_empty_name() {
             SIZE,
             COLLATERAL,
             env.ledger().timestamp() + DAY,
+            false,
         ),
     );
+}
+
+// ------------------------------------------------------------ private circles
+
+/// A private circle of `SIZE` seats, organized by a fresh address, with the
+/// same members funded as `setup`.
+fn setup_private() -> Setup {
+    let env = Env::default();
+    env.mock_all_auths();
+    env.ledger().set_timestamp(1_000_000);
+
+    let sac = env.register_stellar_asset_contract_v2(Address::generate(&env));
+    let token = token::TokenClient::new(&env, &sac.address());
+    let mint = token::StellarAssetClient::new(&env, &sac.address());
+
+    let organizer = Address::generate(&env);
+    let alice = Address::generate(&env);
+    let bob = Address::generate(&env);
+    let carol = Address::generate(&env);
+    let dave = Address::generate(&env);
+    for who in [&organizer, &alice, &bob, &carol, &dave] {
+        mint.mint(who, &10_000);
+    }
+
+    let fill_deadline = env.ledger().timestamp() + 7 * DAY;
+    let id = env.register(
+        Circle,
+        (
+            sac.address(),
+            organizer.clone(),
+            String::from_str(&env, "Family sandoq"),
+            CONTRIBUTION,
+            WEEK,
+            SIZE,
+            COLLATERAL,
+            fill_deadline,
+            true, // private
+        ),
+    );
+
+    Setup {
+        contract: CircleClient::new(&env, &id),
+        env,
+        token,
+        organizer,
+        alice,
+        bob,
+        carol,
+        dave,
+        fill_deadline,
+    }
+}
+
+#[test]
+fn private_circle_reports_itself_private() {
+    let s = setup_private();
+    assert!(s.contract.state().private);
+    assert!(!setup().contract.state().private);
+}
+
+#[test]
+fn private_circle_rejects_an_uninvited_joiner() {
+    let s = setup_private();
+    assert_eq!(s.contract.try_join(&s.alice), Err(Ok(Error::NotAllowed)));
+    assert!(!s.contract.can_join(&s.alice));
+}
+
+#[test]
+fn the_organizer_can_always_join_their_own_private_circle() {
+    let s = setup_private();
+    assert!(s.contract.can_join(&s.organizer));
+    assert_eq!(s.contract.join(&s.organizer), 1);
+}
+
+#[test]
+fn an_invited_address_can_join_a_private_circle() {
+    let s = setup_private();
+    s.contract
+        .allow(&vec![&s.env, s.alice.clone(), s.bob.clone()]);
+
+    assert!(s.contract.can_join(&s.alice));
+    assert_eq!(s.contract.join(&s.alice), 1);
+    assert_eq!(s.contract.join(&s.bob), 2);
+    // Carol was never invited.
+    assert_eq!(s.contract.try_join(&s.carol), Err(Ok(Error::NotAllowed)));
+}
+
+#[test]
+fn allow_emits_an_event_per_invite() {
+    let s = setup_private();
+    s.contract.allow(&vec![&s.env, s.alice.clone()]);
+
+    let expected = Allowed {
+        member: s.alice.clone(),
+    };
+    assert_eq!(
+        s.env.events().all().filter_by_contract(&s.contract.address),
+        vec![
+            &s.env,
+            (
+                s.contract.address.clone(),
+                expected.topics(&s.env),
+                expected.data(&s.env)
+            )
+        ]
+    );
+    assert_eq!(
+        expected.topics(&s.env),
+        vec![
+            &s.env,
+            Symbol::new(&s.env, "allowed").into_val(&s.env),
+            s.alice.clone().into_val(&s.env)
+        ]
+    );
+}
+
+#[test]
+fn a_public_circle_admits_anyone() {
+    let s = setup();
+    // No invite needed; can_join is always true and join succeeds.
+    assert!(s.contract.can_join(&s.dave));
+    assert_eq!(s.contract.join(&s.dave), 1);
 }
