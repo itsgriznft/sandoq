@@ -8,6 +8,7 @@ import { CircleCard } from './components/CircleCard';
 import { CircleDetail } from './components/CircleDetail';
 import { CreateCircleForm } from './components/CreateCircleForm';
 import { ErrorBanner } from './components/ErrorBanner';
+import { Onboarding } from './components/Onboarding';
 import { CircleCardSkeleton, StatsBarSkeleton } from './components/Skeleton';
 import { StatsBar } from './components/StatsBar';
 import { TxStatus } from './components/TxStatus';
@@ -47,6 +48,7 @@ export default function App() {
   const [creating, setCreating] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showOnboard, setShowOnboard] = useState(false);
   const [progress, setProgress] = useState<TxProgress>({ stage: 'idle' });
   const feed = useCircleEventsFeed(sandoq.listing.map((row) => row.address));
 
@@ -101,7 +103,11 @@ export default function App() {
         />
       )}
 
-      {showFeedback ? (
+      {showOnboard ? (
+        <main className="page__body">
+          <Onboarding wallet={wallet} onDone={() => setShowOnboard(false)} />
+        </main>
+      ) : showFeedback ? (
         <main className="page__body">
           <FeedbackPanel wallet={wallet} onClose={() => setShowFeedback(false)} />
         </main>
@@ -113,6 +119,18 @@ export default function App() {
         <CircleDetail address={selected} wallet={wallet} onBack={() => select(null)} />
       ) : (
         <main className="page__body">
+          {!wallet.address && (
+            <div className="newhere">
+              <div>
+                <strong>New to savings circles or wallets?</strong>
+                <span className="muted"> Free testnet money, no risk — get set up in two minutes.</span>
+              </div>
+              <button className="button button--primary" onClick={() => setShowOnboard(true)}>
+                Start here
+              </button>
+            </div>
+          )}
+
           {sandoq.stats ? (
             <StatsBar stats={sandoq.stats} syncedAt={sandoq.syncedAt} />
           ) : (
@@ -181,6 +199,18 @@ export default function App() {
           className="link-button"
           onClick={() => {
             setShowFeedback(false);
+            setShowAnalytics(false);
+            setShowOnboard((open) => !open);
+          }}
+        >
+          {showOnboard ? 'Back to circles' : 'New here?'}
+        </button>
+        {' · '}
+        <button
+          className="link-button"
+          onClick={() => {
+            setShowFeedback(false);
+            setShowOnboard(false);
             setShowAnalytics((open) => !open);
           }}
         >
@@ -191,6 +221,7 @@ export default function App() {
           className="link-button"
           onClick={() => {
             setShowAnalytics(false);
+            setShowOnboard(false);
             setShowFeedback((open) => !open);
           }}
         >

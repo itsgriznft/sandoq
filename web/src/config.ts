@@ -91,3 +91,7 @@ export function formatPeriod(seconds: bigint): string {
 }
 
 export const isClosed = (deadline: bigint): boolean => Number(deadline) * 1000 <= Date.now();
+
+/** Whole seconds between a unix `deadline` and now, never negative. */
+export const secondsLeft = (deadline: bigint): number =>
+  Math.max(0, Number(deadline) - Math.floor(Date.now() / 1000));

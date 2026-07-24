@@ -5,6 +5,7 @@ import {
   formatPeriod,
   formatXlm,
   isClosed,
+  secondsLeft,
   shortAddress,
   timeLeft,
 } from '../config';
@@ -18,6 +19,7 @@ import type { TxProgress, TxStage } from '../lib/rpc';
 import { signTransaction } from '../lib/wallet';
 import { ActivityFeed } from './ActivityFeed';
 import { StatusPill } from './CircleCard';
+import { Countdown } from './Countdown';
 import { ErrorBanner } from './ErrorBanner';
 import { Skeleton } from './Skeleton';
 import { TxStatus } from './TxStatus';
@@ -212,7 +214,7 @@ function Header({
             </div>
             <div>
               <strong>
-                {state.status === 'complete' ? '—' : timeLeft(roundEnd(state))}
+                {state.status === 'complete' ? '—' : <Countdown deadline={roundEnd(state)} />}
               </strong>
               <span>
                 {state.status === 'complete'
@@ -329,10 +331,22 @@ function Actions({
 
       {state.status === 'active' && yourSeat && !yourSeat.paidThisRound && !windowOver && (
         <>
-          <p className="muted">
-            Round {state.round + 1} is open: {formatXlm(state.contribution)} XLM due before the
-            window closes.
-          </p>
+          <div
+            className={`reminder ${secondsLeft(roundEnd(state)) < 86_400 ? 'reminder--urgent' : ''}`}
+            role="status"
+          >
+            <span className="reminder__icon" aria-hidden="true">
+              ⏰
+            </span>
+            <div>
+              <strong>
+                Round {state.round + 1} closes in <Countdown deadline={roundEnd(state)} />
+              </strong>
+              <small>
+                You owe {formatXlm(state.contribution)} XLM. Miss it and it comes out of your stake.
+              </small>
+            </div>
+          </div>
           <button className="button button--primary" onClick={onContribute} disabled={busy}>
             {busy ? 'Working…' : `Contribute ${formatXlm(state.contribution)} XLM`}
           </button>

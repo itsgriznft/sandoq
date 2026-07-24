@@ -21,6 +21,7 @@
 
 export type AnalyticsEvent =
   | 'page_view'
+  | 'onboard_opened'
   | 'wallet_connected'
   | 'wallet_rejected'
   | 'circle_viewed'
