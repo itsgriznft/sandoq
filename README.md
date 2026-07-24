@@ -16,7 +16,7 @@ organizer, ever holds the money.**
 Built for **Level 4 — Green Belt** of the [Stellar Journey to Mastery](https://www.risein.com/programs/stellar-journey-to-mastery-monthly-builder-challenges)
 builder challenge. Idea approved by the Stellar Builder Team before development began.
 
-**Live demo:** https://itsgriznft.github.io/sandoq/ · **New here?** [Join a circle in 5 minutes →](ONBOARDING.md)
+**Live demo:** https://itsgriznft.github.io/sandoq/ · **Pitch deck:** https://itsgriznft.github.io/sandoq/pitch.html · **New here?** [Join a circle in 5 minutes →](ONBOARDING.md)
 
 ---
 
@@ -386,6 +386,47 @@ same pipe. The in-app panel shows on-chain metrics from `stats()` next to the se
 cookies, no third-party scripts.
 
 **Mobile.** Single column below 900px, 44px tap targets, no horizontal scroll from 320px up.
+
+---
+
+## User growth & feedback iteration
+
+Sandoq collects user feedback two ways, and both feed real product changes.
+
+**On-chain feedback.** Every rating left in the app is a signed transaction to the feedback
+contract, so the community summary on the site is read straight from the ledger — not asserted.
+See [On-chain artifacts](#on-chain-artifacts) for the contract, and verify any entry on Stellar
+Expert.
+
+**Onboarding form.** New users are also asked to fill a short Google Form (wallet address, name,
+email, and a product rating) so we can reach them, dedupe real people, and track the cohort. The
+form questions and process live in [docs/user-onboarding.md](docs/user-onboarding.md).
+
+- **Onboarding form:** _add your Google Form link here_
+- **Responses (Excel export):** [docs/user-feedback.xlsx](docs/user-feedback.xlsx) — _export from the form and commit_
+
+### What we changed from feedback
+
+Real feedback already on-chain from the first pilot circles:
+
+| Who | Said | What we shipped |
+|---|---|---|
+| A member | *"Wanted a reminder before the round closes."* | A live ticking countdown to each round's deadline, plus an urgent reminder banner that spells out what you owe — [`a95a3ac`](https://github.com/itsgriznft/sandoq/commit/a95a3ac) |
+| New users | Wallet setup was the hard part | A four-step onboarding guide from no wallet to a first on-chain join — [`a95a3ac`](https://github.com/itsgriznft/sandoq/commit/a95a3ac) |
+| A member | Seat order was unclear | Seat grid in payout order with a next-payout highlight — [`3308ace`](https://github.com/itsgriznft/sandoq/commit/3308ace) |
+
+### Next phase (Blue → Black)
+
+Prioritised directly from what users ask for and the roadmap:
+
+1. **Notifications** — email/push reminders before a round closes, beyond the in-app countdown.
+2. **Sealed-bid payout auctions** — let members bid a discount to take the pot early, so early
+   positions are earned, not assigned.
+3. **SEP-24 anchor flow** — deposit and withdraw in local currency on testnet.
+4. **Invite links** — one-click invite for private circles, so onboarding a whole group is a single
+   share rather than pasting addresses.
+
+Each ships as its own commit and gets linked back here as it lands.
 
 ---
 

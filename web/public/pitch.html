@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sandoq — Pitch Deck</title>
+    <style>
+      :root {
+        --bg: #0e1016;
+        --panel: #161a24;
+        --border: #262c3a;
+        --text: #e7e9ee;
+        --muted: #9aa2b4;
+        --accent: #f5a623;
+        --accent-ink: #1a1205;
+        --green: #4cc38a;
+        --blue: #5aa2f5;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { height: 100%; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.5;
+        overflow: hidden;
+      }
+      .deck { height: 100vh; width: 100vw; position: relative; }
+      .slide {
+        position: absolute;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        padding: clamp(1.5rem, 6vw, 6rem);
+        max-width: 1100px;
+        margin: 0 auto;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+      .slide.active { display: flex; opacity: 1; }
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.78rem;
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+      h1 { font-size: clamp(2.4rem, 7vw, 4.4rem); line-height: 1.05; letter-spacing: -0.02em; }
+      h2 { font-size: clamp(1.8rem, 4.5vw, 3rem); line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 1.4rem; }
+      p.lead { font-size: clamp(1.1rem, 2.2vw, 1.5rem); color: var(--muted); max-width: 46ch; }
+      ul { list-style: none; display: flex; flex-direction: column; gap: 0.9rem; margin-top: 0.5rem; }
+      li { font-size: clamp(1rem, 1.9vw, 1.35rem); display: flex; gap: 0.75rem; align-items: baseline; }
+      li::before { content: ''; flex: 0 0 0.5rem; height: 0.5rem; margin-top: 0.55rem; border-radius: 50%; background: var(--accent); }
+      li.dim { color: var(--muted); }
+      li.dim::before { background: var(--border); }
+      .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .stat { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 800; color: var(--accent); letter-spacing: -0.02em; }
+      .stat small { display: block; font-size: 0.9rem; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-top: 0.3rem; }
+      .stats-row { display: flex; gap: 2.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.3rem 1.5rem;
+      }
+      .flow { display: flex; flex-direction: column; gap: 0.6rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: clamp(0.75rem, 1.5vw, 1rem); color: var(--muted); }
+      .flow b { color: var(--text); }
+      .roadmap { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 0.5rem; }
+      .phase { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; }
+      .chip { font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 999px; white-space: nowrap; align-self: start; }
+      .chip.done { background: color-mix(in srgb, var(--green) 20%, transparent); color: var(--green); }
+      .chip.now { background: color-mix(in srgb, var(--blue) 20%, transparent); color: var(--blue); }
+      .chip.next { background: var(--panel); color: var(--muted); border: 1px solid var(--border); }
+      .brand { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 2rem; }
+      .brand svg { width: 54px; height: 54px; color: var(--accent); }
+      a { color: var(--accent); }
+      .muted { color: var(--muted); }
+      .footer { position: fixed; bottom: 1.2rem; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 1.5rem; font-size: 0.78rem; color: var(--muted); pointer-events: none; }
+      .footer a { pointer-events: auto; }
+      .dots { display: flex; gap: 0.4rem; }
+      .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
+      .dot.on { background: var(--accent); }
+      .nav-hint { opacity: 0.7; }
+      @media (max-width: 720px) {
+        .cols { grid-template-columns: 1fr; gap: 1.2rem; }
+        body { overflow: auto; }
+        .slide { position: relative; display: none; min-height: 100vh; }
+        .slide.active { display: flex; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="deck" id="deck">
+      <!-- 1 — Title -->
+      <section class="slide active">
+        <div class="brand">
+          <svg viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="13" stroke="currentColor" stroke-width="2.4" stroke-opacity="0.3" />
+            <circle cx="24" cy="11" r="4.2" fill="currentColor" />
+            <circle cx="37" cy="24" r="4.2" fill="#4a5165" />
+            <circle cx="24" cy="37" r="4.2" fill="#4a5165" />
+            <circle cx="11" cy="24" r="4.2" fill="#4a5165" />
+          </svg>
+          <span style="font-size:1.4rem;font-weight:700">Sandoq</span>
+        </div>
+        <h1>Savings circles,<br />with the trust in code.</h1>
+        <p class="lead" style="margin-top:1.5rem">
+          The oldest way people save together — rebuilt on Stellar so no organizer can ever run off
+          with the pot.
+        </p>
+        <p class="muted" style="margin-top:2rem">
+          Live on testnet · <a href="https://itsgriznft.github.io/sandoq/">itsgriznft.github.io/sandoq</a>
+        </p>
+      </section>
+
+      <!-- 2 — Problem -->
+      <section class="slide">
+        <div class="eyebrow">The problem</div>
+        <h2>A trillion-dollar habit that runs on a notebook</h2>
+        <div class="cols">
+          <div>
+            <p class="lead">
+              Rotating savings circles — <b>sandoq</b>, esusu, chit funds, tandas — let a group save
+              together: everyone pays in each round, the whole pot goes to one member, rotating until
+              all are paid.
+            </p>
+          </div>
+          <div>
+            <ul>
+              <li>The organizer holds every contribution — and sometimes disappears with it.</li>
+              <li>A member who collects early stops paying.</li>
+              <li>Records live in one person's head. Disputes have no referee.</li>
+              <li>It can't cross a border — diaspora families are shut out.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 — Solution -->
+      <section class="slide">
+        <div class="eyebrow">The solution</div>
+        <h2>Move the trust into a smart contract</h2>
+        <div class="cols">
+          <div>
+            <p class="lead">
+              Sandoq keeps the social circle and removes its failure modes. A Soroban contract — not a
+              person — escrows every stake and pays out every pot.
+            </p>
+          </div>
+          <div>
+            <ul>
+              <li><b>Nobody holds the money.</b> Not the organizer, not us.</li>
+              <li>Miss a round? It's covered from <b>your own</b> collateral first.</li>
+              <li>Payouts are a permissionless crank — the circle finishes itself.</li>
+              <li>Every deposit and payout is public and verifiable on-chain.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 — How it works -->
+      <section class="slide">
+        <div class="eyebrow">How it works</div>
+        <h2>Fill → contribute → settle → rotate</h2>
+        <div class="card">
+          <div class="flow">
+            <div><b>Filling</b> &nbsp; each member stakes collateral to take a seat →</div>
+            <div><b>Active</b> &nbsp;&nbsp; every round: everyone contributes, the pot pays one member →</div>
+            <div><b>&nbsp;</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a missed round is covered from that member's stake →</div>
+            <div><b>Complete</b> every member has been paid once; stakes come back.</div>
+          </div>
+        </div>
+        <p class="lead" style="margin-top:1.5rem">
+          The contract ends holding exactly zero — an invariant checked after every settle in the tests.
+        </p>
+      </section>
+
+      <!-- 5 — Trust model -->
+      <section class="slide">
+        <div class="eyebrow">Why it's safe</div>
+        <h2>Collateral is a dial, not a leap of faith</h2>
+        <p class="lead">Sandoq doesn't manufacture trust between strangers — it removes the need for a trusted organizer, and lets each circle choose how much trust the rest requires.</p>
+        <div class="stats-row" style="margin-top:2rem">
+          <div><div class="stat" style="color:var(--green)">0×</div><small>Trusted friends — a missed round just shrinks the pot</small></div>
+          <div><div class="stat" style="color:var(--accent)">1×</div><small>A community — covers an occasional miss</small></div>
+          <div><div class="stat" style="color:var(--blue)">(n−1)×</div><small>Strangers — fully trustless, even if one takes the pot and runs</small></div>
+        </div>
+      </section>
+
+      <!-- 6 — Why Stellar -->
+      <section class="slide">
+        <div class="eyebrow">Why Stellar</div>
+        <h2>A payments chain, with the last mile built in</h2>
+        <div class="cols">
+          <div>
+            <ul>
+              <li><b>~5s finality, near-zero fees</b> — small monthly contributions actually make sense.</li>
+              <li><b>Anchors (SEP-24)</b> — members enter and exit in local currency; the wallet-to-cash link informal savers need.</li>
+            </ul>
+          </div>
+          <div>
+            <ul>
+              <li><b>Soroban</b> — escrow, a factory that deploys one contract per circle, cross-contract aggregation.</li>
+              <li>Settles in a stable asset, so no member carries volatility risk.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 — Market -->
+      <section class="slide">
+        <div class="eyebrow">Market opportunity</div>
+        <h2>Existing behavior, not a new one to teach</h2>
+        <div class="stats-row">
+          <div><div class="stat">1.4B</div><small>adults still unbanked worldwide (World Bank Findex 2021)</small></div>
+          <div><div class="stat">100Ms</div><small>people already save through ROSCAs across Asia, Africa, LatAm, MENA</small></div>
+          <div><div class="stat">$860B+</div><small>annual global remittances — the cross-border corridor Sandoq extends into</small></div>
+        </div>
+        <p class="lead" style="margin-top:2rem">
+          We're not convincing people to save in circles — hundreds of millions already do. We're
+          making the circle they already trust safe, portable, and borderless.
+        </p>
+      </section>
+
+      <!-- 8 — Architecture -->
+      <section class="slide">
+        <div class="eyebrow">Architecture</div>
+        <h2>A factory, a circle per group, and the token</h2>
+        <div class="card">
+          <div class="flow">
+            <div><b>Factory</b> &nbsp; create() · listing() · stats()</div>
+            <div>&nbsp; │ 1. deploy_v2 + constructor &nbsp;&nbsp; 2. cross-contract state()</div>
+            <div>&nbsp; ▼</div>
+            <div><b>Circle</b> &nbsp;&nbsp; join · contribute · settle · reclaim (one per group)</div>
+            <div>&nbsp; │ 3. nested token transfer()</div>
+            <div>&nbsp; ▼</div>
+            <div><b>Stellar Asset Contract</b> &nbsp; native XLM / USDC</div>
+          </div>
+        </div>
+        <p class="muted" style="margin-top:1.3rem">Three kinds of inter-contract calls · React + Stellar Wallets Kit frontend · live event feed · on-chain feedback registry.</p>
+      </section>
+
+      <!-- 9 — Traction -->
+      <section class="slide">
+        <div class="eyebrow">What's built</div>
+        <h2>A working product, live on testnet</h2>
+        <div class="cols">
+          <div>
+            <ul>
+              <li>Circle + factory + feedback contracts deployed on testnet</li>
+              <li>47 contract tests · 38 frontend tests · CI + Pages green</li>
+              <li>Multi-wallet, mobile-responsive, real-time event feed</li>
+            </ul>
+          </div>
+          <div>
+            <ul>
+              <li>Invite-only or public circles — organizer-controlled access</li>
+              <li>On-chain feedback: every rating a verifiable, signed record</li>
+              <li>Analytics &amp; monitoring, self-contained and private</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 — Growth -->
+      <section class="slide">
+        <div class="eyebrow">Growth strategy</div>
+        <h2>Onboard circles, not just users</h2>
+        <p class="lead">One circle brings 5–12 members at once — adoption compounds by group.</p>
+        <div class="cols" style="margin-top:1.5rem">
+          <div>
+            <ul>
+              <li><b>Affinity groups</b> — workplaces, neighborhoods, student cohorts.</li>
+              <li><b>Diaspora corridors</b> — families saving across borders, our sharpest wedge.</li>
+            </ul>
+          </div>
+          <div>
+            <ul>
+              <li><b>Crypto-native communities</b> — Stellar &amp; builder cohorts for the first users.</li>
+              <li><b>Frictionless onboarding</b> — a guided funnel from no wallet to first join.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11 — Roadmap -->
+      <section class="slide">
+        <div class="eyebrow">Roadmap</div>
+        <h2>From MVP to mainnet corridors</h2>
+        <div class="roadmap">
+          <div class="phase">
+            <span class="chip done">Green ✓</span>
+            <div>Production MVP: factory + circle, collateral &amp; default handling, live web app, first users.</div>
+          </div>
+          <div class="phase">
+            <span class="chip now">Blue — now</span>
+            <div>Growth to 50+ users, round reminders, sealed-bid payout auctions, SEP-24 anchor flow on testnet, pitch &amp; demo.</div>
+          </div>
+          <div class="phase">
+            <span class="chip next">Black</span>
+            <div>Security audit, mainnet launch with production anchor ramps, real cross-border circles, an SCF application.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12 — Close -->
+      <section class="slide">
+        <div class="brand">
+          <svg viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="13" stroke="currentColor" stroke-width="2.4" stroke-opacity="0.3" />
+            <circle cx="24" cy="11" r="4.2" fill="currentColor" />
+            <circle cx="37" cy="24" r="4.2" fill="#4a5165" />
+            <circle cx="24" cy="37" r="4.2" fill="#4a5165" />
+            <circle cx="11" cy="24" r="4.2" fill="#4a5165" />
+          </svg>
+          <span style="font-size:1.4rem;font-weight:700">Sandoq</span>
+        </div>
+        <h1>The circle you already<br />trust — made unbreakable.</h1>
+        <p class="lead" style="margin-top:1.5rem">
+          Try it: <a href="https://itsgriznft.github.io/sandoq/">itsgriznft.github.io/sandoq</a><br />
+          Code: <a href="https://github.com/itsgriznft/sandoq">github.com/itsgriznft/sandoq</a>
+        </p>
+      </section>
+    </div>
+
+    <div class="footer">
+      <span class="nav-hint">← → or space to navigate</span>
+      <div class="dots" id="dots"></div>
+      <span>Sandoq · Stellar Journey to Mastery</span>
+    </div>
+
+    <script>
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const dotsBox = document.getElementById('dots');
+      let i = 0;
+      slides.forEach(() => {
+        const d = document.createElement('span');
+        d.className = 'dot';
+        dotsBox.appendChild(d);
+      });
+      const dots = Array.from(dotsBox.children);
+      function show(n) {
+        i = Math.max(0, Math.min(slides.length - 1, n));
+        slides.forEach((s, k) => s.classList.toggle('active', k === i));
+        dots.forEach((d, k) => d.classList.toggle('on', k === i));
+        if (window.innerWidth <= 720) slides[i].scrollIntoView({ behavior: 'smooth' });
+      }
+      show(0);
+      document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+        if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+        if (e.key === 'Home') show(0);
+        if (e.key === 'End') show(slides.length - 1);
+      });
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
+        show(i + 1);
+      });
+    </script>
+  </body>
+</html>
